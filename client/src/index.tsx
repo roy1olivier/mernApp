@@ -5,7 +5,7 @@ import App from './App';
 import Welcome from './welcome';
 import reportWebVitals from './reportWebVitals';
 import Root from "./routes/root";
-import TodoApp from './routes/todo';
+import Expenses from './routes/expenses'
 import {
   createBrowserRouter,
   RouterProvider,
@@ -21,8 +21,8 @@ const router = createBrowserRouter([
     element: <Welcome />,
   },
   {
-    path: "/todoApp",
-    element: <TodoApp />,
+    path: "/expenses",
+    element: <Expenses />,
   },
 ]);
 const root = ReactDOM.createRoot(
