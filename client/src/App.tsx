@@ -24,7 +24,7 @@ function App() {
                 <a href={`/welcome`}>Welcome Bro</a>
               </li>
               <li>
-                <a href={`/todoApp`}>TODO APP MERN</a>
+                <a href={`/expenses`}>Expenses</a>
               </li>
             </ul>
           </nav>

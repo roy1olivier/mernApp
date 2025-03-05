@@ -2,7 +2,7 @@ import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import mongoose, { Schema, Document } from 'mongoose';
 import dotenv from 'dotenv';
-import UserModel from './models/userDocumentM';
+import DepenseModel from './models/depenses'
 dotenv.config();
 
 const app: Express = express();
@@ -34,10 +34,10 @@ app.get('/health', (_req: Request, res: Response) => {
 app.use(express.json());
 app.post('/add-user', async (req, res) => {
     try {
-        const { name, age, email } = req.body;
-        const user = new UserModel({ name, age, email });
-        await user.save();
-        res.status(201).json({ message: 'Person added successfully', user });
+        const { name, amount, date, typeD } = req.body;
+        const depense = new DepenseModel({ name, amount, date, typeD});
+        await depense.save();
+        res.status(201).json({ message: 'Person added successfully', depense });
       } catch (error : any) {
         res.status(400).json({ error: 'Failed to add person', details: error.message });
       }
@@ -47,10 +47,20 @@ app.post('/add-user', async (req, res) => {
   app.use(express.json());
   app.get('/getuser', async (req, res) => {
     try {
-      const people = await UserModel.find();
-      res.status(200).json(people);
+      const depense = await DepenseModel.find();
+      res.status(200).json(depense);
     } catch (error : any) {
       res.status(400).json({ error: 'Failed to retrieve people', details: error.message });
+    }
+  });
+
+
+  app.get('/wipe-everything', async (req, res) => {
+    try {
+      const depensess = await DepenseModel.deleteMany({})
+      res.status(200).json(depensess);
+    } catch (error : any) {
+      res.status(400).json({ error: 'Failed to delete people', details: error.message });
     }
   });
 
