@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Chart } from "react-google-charts";
+import { sendMessage, listenForMessages } from '../utils/socket';
 
 function Expenses() {
  const [expenseName, setExpenseName] = useState('');
  const [expenseAmount, setExpenseAmount] = useState('');
  const [expenseDate, setExpenseDate] = useState('');
  const [expenseType, setExpenseType] = useState('');
- 
+
+
  const initialOptions = {
   title: "Mes Depenses",
 };
@@ -23,6 +25,8 @@ const [clickedButton,setClicked] = useState("");
   ];
  const [dataExpenses, setDataExpenses] = useState(data);
  
+ 
+	 
 
 //BUTTONS LOGIC
 
@@ -55,9 +59,12 @@ const handleButton1Click = () => {
 // Logic for Button 2
 const handleButton2Click = () => {
   console.log("Button 2 clicked: Executing logic for Button 2");
-  console.log(JSON.stringify(dataExpenses, undefined, 2));
   const emptydate=[["Empty", "Empty"]];
   setDataExpenses(emptydate);
+  console.log("SENDING MESSAGE");
+  sendMessage("RESET");
+  
+
   // Add your custom logic for button 2 here
 };
 
