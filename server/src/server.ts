@@ -3,6 +3,10 @@ import cors from 'cors';
 import mongoose, { Schema, Document } from 'mongoose';
 import dotenv from 'dotenv';
 import DepenseModel from './models/depenses'
+import http from 'http';
+import socketServer   from 'socket.io';
+
+
 dotenv.config();
 
 const app: Express = express();
@@ -67,6 +71,61 @@ app.post('/add-user', async (req, res) => {
 
 const PORT: string | number = process.env.PORT || 3000;
 
+
+// Create an HTTP server
+const server = http.createServer(app);
+const io = new socketServer.Server(server, {
+  cors: {
+    origin: "http://localhost:3001", // You can replace "*" with your frontend app's URL for security reasons
+  },
+});
+const connections = [];
+io.on('connection', function (socket) {
+	console.log("Connected to Socket!!"+ socket.id)	
+	connections.push(socket)
+
+
+	socket.on('disconnect', function(){
+		console.log('Disconnected - '+ socket.id);
+	});
+
+  
+  socket.on('message', (msg: string) => {
+    console.log('Received message:', msg);
+    io.emit('message', msg); // Broadcast the message to all connected clients
+  });
+
+  // Send a welcome message to the client
+  console.log('Sending welcome message');
+  socket.send('Welcome to the WebSocket server!');
+	/*socket.on('addItem',(addData)=>{
+		var todoItem = new todoModel({
+			itemId:addData.id,
+			item:addData.item,
+			completed: addData.completed
+		})
+
+		todoItem.save((err,result)=> {
+			if (err) {console.log("---Gethyl ADD NEW ITEM failed!! " + err)}
+			else {
+				// connections.forEach((currentConnection)=>{
+				// 	currentConnection.emit('itemAdded',addData)
+				// })
+				io.emit('itemAdded',addData)
+				
+				console.log({message:"+++Gethyl ADD NEW ITEM worked!!"})
+			}
+		})
+	})*/
+
+  socket.on('chat message', (msg) => {
+    console.log('Message received:', msg);
+    // Emit an event back to the client
+    socket.emit('chat response', 'Server received: ' + msg);
+  });
+
+});
+io.listen(4000);
 app.listen(PORT, () => {
-    console.log(`Server is running on PORT: ${PORT}`);
+  console.log(`Server is running on PORT: ${PORT}`);
 });

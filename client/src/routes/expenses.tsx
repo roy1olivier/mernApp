@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Chart } from "react-google-charts";
+import { sendMessage, listenForMessages } from '../utils/socket';
+import Modal from "../components/Modal";
+import ComponentDialogPanel from "../components/DialogPanel"
 
 function Expenses() {
  const [expenseName, setExpenseName] = useState('');
  const [expenseAmount, setExpenseAmount] = useState('');
  const [expenseDate, setExpenseDate] = useState('');
  const [expenseType, setExpenseType] = useState('');
+ const [isOpen, setIsOpen] = useState(true);
  
  const initialOptions = {
   title: "Mes Depenses",
@@ -23,10 +27,22 @@ const [clickedButton,setClicked] = useState("");
   ];
  const [dataExpenses, setDataExpenses] = useState(data);
  
+ useEffect(() => {
+  // Listen for incoming messages from the server
+    listenForMessages(() => {
+      //console.log("TADA");
+    });
+  
+  // Cleanup the socket connection when the component unmounts
+  return () => {
+  };
+}, []);
+
 
 //BUTTONS LOGIC
 
 const handleButton1Click = () => {
+  console.log("ISOPen::"+isOpen);
   console.log("Button 1 clicked: Executing logic for Button 1");
   console.log(JSON.stringify(dataExpenses, undefined, 2));
   const typeToFind = expenseType;
@@ -55,9 +71,13 @@ const handleButton1Click = () => {
 // Logic for Button 2
 const handleButton2Click = () => {
   console.log("Button 2 clicked: Executing logic for Button 2");
-  console.log(JSON.stringify(dataExpenses, undefined, 2));
   const emptydate=[["Empty", "Empty"]];
   setDataExpenses(emptydate);
+  console.log("SENDING MESSAGE");
+  sendMessage("RESET");
+  setIsOpen(true);
+  console.log("ISOPen::"+isOpen);
+
   // Add your custom logic for button 2 here
 };
 
@@ -65,7 +85,8 @@ const handleButton2Click = () => {
       return (
         <div className="App">
           <header className="App-header">
-          
+         
+         <ComponentDialogPanel title="SALUTT TOI!!" dialogDescription='description' dialogAdditionalText='nonono' setIsOpen={setIsOpen} isOpen={isOpen}/>
          <p>
           Ajouter Depenses:
           </p>
