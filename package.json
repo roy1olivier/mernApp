@@ -11,9 +11,13 @@
   "description": "",
   "dependencies": {
     "@reduxjs/toolkit": "^2.6.1",
+    "react-bootstrap": "^2.10.9",
     "react-redux": "^9.2.0",
     "redux": "^5.0.1",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1"
+  },
+  "devDependencies": {
+    "@types/react-bootstrap": "^0.32.37"
   }
 }

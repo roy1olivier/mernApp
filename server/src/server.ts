@@ -94,6 +94,10 @@ io.on('connection', function (socket) {
     console.log('Received message:', msg);
     io.emit('message', msg); // Broadcast the message to all connected clients
   });
+
+  // Send a welcome message to the client
+  console.log('Sending welcome message');
+  socket.send('Welcome to the WebSocket server!');
 	/*socket.on('addItem',(addData)=>{
 		var todoItem = new todoModel({
 			itemId:addData.id,

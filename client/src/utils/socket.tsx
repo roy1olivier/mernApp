@@ -10,7 +10,8 @@ export const sendMessage = (message: string) => {
 
 // Listen for messages from the server
 export const listenForMessages = (callback: (message: string) => void) => {
-  socket.on('receive-message', (msg: string) => {
-    callback(msg);
+  socket.on('message', (msg: string) => {
+    console.log("MESSAGE RECEIVED FROM SERVER::" + msg);
+    //callback(msg);
   });
 };

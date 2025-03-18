@@ -26,6 +26,9 @@ function App() {
               <li>
                 <a href={`/expenses`}>Expenses</a>
               </li>
+              <li>
+                <a href={`/test`}>TEst</a>
+              </li>
             </ul>
           </nav>
       </header>
