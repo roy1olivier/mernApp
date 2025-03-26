@@ -1,8 +1,6 @@
-interface Depenses{
-    name:string;
-    amount:number;
-    date:Date;
-    typeD:string;
-}
-
-export default Depenses;
+export interface interfaceExpense {
+    expenseName:string,
+    expenseAmount:string,
+    expenseDate:string,
+    expenseType:string
+  }

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Chart } from "react-google-charts";
-import { sendMessage, listenForMessages } from '../utils/socket';
-import Modal from "../components/Modal";
-import ComponentDialogPanel from "../components/DialogPanel"
+import { sendMessage, listenForMessages, sendItem, interfaceExpense } from '../utils/socket';
+import ModalComponent from "../components/Modal";
 
 function Expenses() {
  const [expenseName, setExpenseName] = useState('');
@@ -25,13 +24,18 @@ const [clickedButton,setClicked] = useState("");
     ["Credit card", 2],
 
   ];
+
+    useEffect(()=> {
+    console.log("PAGE LOAD - TO DO ONCE OR WHEN REFRESH");
+
+    },[])
+  
+
  const [dataExpenses, setDataExpenses] = useState(data);
  
  useEffect(() => {
   // Listen for incoming messages from the server
-    listenForMessages(() => {
-      //console.log("TADA");
-    });
+    listenForMessages();
   
   // Cleanup the socket connection when the component unmounts
   return () => {
@@ -42,9 +46,6 @@ const [clickedButton,setClicked] = useState("");
 //BUTTONS LOGIC
 
 const handleButton1Click = () => {
-  console.log("ISOPen::"+isOpen);
-  console.log("Button 1 clicked: Executing logic for Button 1");
-  console.log(JSON.stringify(dataExpenses, undefined, 2));
   const typeToFind = expenseType;
   const indexx = dataExpenses.findIndex(([key]) => key===typeToFind);
   if(indexx == -1){
@@ -54,7 +55,14 @@ const handleButton1Click = () => {
       ...options,
       title: 'Mes Depenses',
     });
-    console.log(JSON.stringify(dataExpenses, undefined, 2));
+    const expenseToSend : interfaceExpense = {
+      expenseName:expenseName,
+      expenseAmount:expenseAmount,
+      expenseDate:new Date().toDateString(),
+      expenseType:expenseType
+    };
+    console.log("Sending expense to backend server");
+    sendItem(expenseToSend);
   }
   else{
     let newValueForExpenseType = Number(dataExpenses[indexx][1])+Number(expenseAmount);
@@ -65,6 +73,15 @@ const handleButton1Click = () => {
       ...options,
       title: 'Mes Depenses',
     });
+    const expenseToSend : interfaceExpense = {
+      expenseName:expenseName,
+      expenseAmount:expenseAmount,
+      expenseDate:expenseDate,
+      expenseType:expenseType
+    };
+    console.log("Sending expense to backend server");
+    sendItem(expenseToSend);
+
   }
   };
 
@@ -76,8 +93,6 @@ const handleButton2Click = () => {
   console.log("SENDING MESSAGE");
   sendMessage("RESET");
   setIsOpen(true);
-  console.log("ISOPen::"+isOpen);
-
   // Add your custom logic for button 2 here
 };
 
@@ -86,7 +101,6 @@ const handleButton2Click = () => {
         <div className="App">
           <header className="App-header">
          
-         <ComponentDialogPanel title="SALUTT TOI!!" dialogDescription='description' dialogAdditionalText='nonono' setIsOpen={setIsOpen} isOpen={isOpen}/>
          <p>
           Ajouter Depenses:
           </p>
