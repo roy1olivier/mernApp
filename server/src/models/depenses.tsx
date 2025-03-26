@@ -1,13 +1,13 @@
 import mongoose, { Schema, Document, mongo } from 'mongoose';
-import Depenses from '../interfaces/depensesInterface';
+import {interfaceExpense} from '../interfaces/depensesInterface';
 
-const depenseSchema =  new Schema<Depenses>({
-    name: { type: String, required: true },
-    amount: { type: Number, required: true },
-    date: { type: Date, required: true },
-    typeD:{type: String, required: true},
+const expenseSchema =  new Schema<interfaceExpense>({
+    expenseName: { type: String, required: true },
+    expenseAmount: { type: String, required: true },
+    expenseDate: { type: String, required: true },
+    expenseType:{type: String, required: true},
 })
 
-const DepenseModel = mongoose.model('Depense', depenseSchema);
+const expenseModel = mongoose.model('Depense', expenseSchema);
 
-export default DepenseModel;
+export default expenseModel;

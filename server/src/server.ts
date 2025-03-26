@@ -2,10 +2,10 @@ import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import mongoose, { Schema, Document } from 'mongoose';
 import dotenv from 'dotenv';
-import DepenseModel from './models/depenses'
+import expenseModel from './models/depenses'
 import http from 'http';
 import socketServer   from 'socket.io';
-
+import {interfaceExpense} from './interfaces/depensesInterface'
 
 dotenv.config();
 
@@ -36,10 +36,10 @@ app.get('/health', (_req: Request, res: Response) => {
 
 // POST endpoint to insert data into the database
 app.use(express.json());
-app.post('/add-user', async (req, res) => {
+app.post('/addExpense', async (req, res) => {
     try {
         const { name, amount, date, typeD } = req.body;
-        const depense = new DepenseModel({ name, amount, date, typeD});
+        const depense = new expenseModel({ name, amount, date, typeD});
         await depense.save();
         res.status(201).json({ message: 'Person added successfully', depense });
       } catch (error : any) {
@@ -49,9 +49,9 @@ app.post('/add-user', async (req, res) => {
   
   // GET endpoint to retrieve all people from the database
   app.use(express.json());
-  app.get('/getuser', async (req, res) => {
+  app.get('/getAllExpenses', async (req, res) => {
     try {
-      const depense = await DepenseModel.find();
+      const depense = await expenseModel.find();
       res.status(200).json(depense);
     } catch (error : any) {
       res.status(400).json({ error: 'Failed to retrieve people', details: error.message });
@@ -61,7 +61,7 @@ app.post('/add-user', async (req, res) => {
 
   app.get('/wipe-everything', async (req, res) => {
     try {
-      const depensess = await DepenseModel.deleteMany({})
+      const depensess = await expenseModel.deleteMany({})
       res.status(200).json(depensess);
     } catch (error : any) {
       res.status(400).json({ error: 'Failed to delete people', details: error.message });
@@ -76,7 +76,7 @@ const PORT: string | number = process.env.PORT || 3000;
 const server = http.createServer(app);
 const io = new socketServer.Server(server, {
   cors: {
-    origin: "http://localhost:3001", // You can replace "*" with your frontend app's URL for security reasons
+    origin: "*", // You can replace "*" with your frontend app's URL for security reasons
   },
 });
 const connections = [];
@@ -98,25 +98,21 @@ io.on('connection', function (socket) {
   // Send a welcome message to the client
   console.log('Sending welcome message');
   socket.send('Welcome to the WebSocket server!');
-	/*socket.on('addItem',(addData)=>{
-		var todoItem = new todoModel({
-			itemId:addData.id,
-			item:addData.item,
-			completed: addData.completed
-		})
-
-		todoItem.save((err,result)=> {
-			if (err) {console.log("---Gethyl ADD NEW ITEM failed!! " + err)}
-			else {
-				// connections.forEach((currentConnection)=>{
-				// 	currentConnection.emit('itemAdded',addData)
-				// })
-				io.emit('itemAdded',addData)
-				
-				console.log({message:"+++Gethyl ADD NEW ITEM worked!!"})
-			}
-		})
-	})*/
+	
+  
+  socket.on('addExpense',(addData:interfaceExpense)=>{
+    console.log("new expense received:: " +  addData);
+		var expenseItem = new expenseModel({
+			expenseName:addData.expenseName,
+			expenseAmount:addData.expenseAmount,
+			expenseDate: addData.expenseDate,
+      expenseType:addData.expenseType
+		});
+   
+		expenseItem.save()
+        .then(result => {io.emit('itemAdded',addData); console.log("expense saved"+result)})
+        .catch(err => console.log(err));
+	})
 
   socket.on('chat message', (msg) => {
     console.log('Message received:', msg);

@@ -5,28 +5,40 @@ import Modal from 'react-bootstrap/Modal';
 
 interface ModalProps {
   show: boolean;
-  //onClose: () => void;
   title: string;
-  //children: React.ReactNode;
   dialogDescription: string;
   dialogAdditionalText: string;
   setShow:React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ModalComponent: React.FC<ModalProps> = ({ title, dialogDescription, dialogAdditionalText,  show, setShow }) => {
-  const handleClose = () => setShow(false);
-  //const handleShow = () => setShow(true);
+  const handleClose = () => {setShow(false);}
+
+  const buttonClickHandler = (buttonName: string) => {
+
+    if(buttonName=="Primary"){
+
+    }
+    else{
+     
+    }
+    handleClose();
+  }
+
   return (
-    <Modal show={show} onHide={handleClose}>
+    <Modal show={show} onHide={handleClose}  backdrop="static"
+    keyboard={false}  size="lg"
+    aria-labelledby="contained-modal-title-vcenter"
+    centered>
         <Modal.Header>
-          <Modal.Title>{title}</Modal.Title>
+          <Modal.Title id="contained-modal-title-vcenter">{title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>{dialogDescription}</Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button variant="secondary" onClick={() => buttonClickHandler('Secondary')}>
             Close
           </Button>
-          <Button variant="primary" onClick={handleClose}>
+          <Button variant="primary" onClick={() => buttonClickHandler('Primary')}>
             Save Changes
           </Button>
         </Modal.Footer>
