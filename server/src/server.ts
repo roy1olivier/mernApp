@@ -51,7 +51,7 @@ app.post('/addExpense', async (req, res) => {
   app.use(express.json());
   app.get('/getAllExpenses', async (req, res) => {
     try {
-      const depense = await expenseModel.find();
+      const depense = await expenseModel.find({}, { _id: 0, __v:0 });
       res.status(200).json(depense);
     } catch (error : any) {
       res.status(400).json({ error: 'Failed to retrieve people', details: error.message });
