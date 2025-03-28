@@ -3,35 +3,54 @@ import { Chart } from "react-google-charts";
 import { sendMessage, listenForMessages, sendItem, interfaceExpense } from '../utils/socket';
 import ModalComponent from "../components/Modal";
 
+
+import axios from 'axios';
+
+
 function Expenses() {
  const [expenseName, setExpenseName] = useState('');
  const [expenseAmount, setExpenseAmount] = useState('');
  const [expenseDate, setExpenseDate] = useState('');
  const [expenseType, setExpenseType] = useState('');
  const [isOpen, setIsOpen] = useState(true);
- 
+ const [allExpenses, setAllExpenses] = useState<interfaceExpense | interfaceExpense[] | null>(null);
  const initialOptions = {
   title: "Mes Depenses",
 };
- const [options, setOptions] = useState(initialOptions);
-//infunctional component you can use useRef hook
-const [clickedButton,setClicked] = useState("");
-  const data = [
-    ["type", "montant"],
-    ["Food", 9],
-    ["Utilities", 3],
-    ["Mortage", 6],
-    ["Credit card", 2],
+const [options, setOptions] = useState(initialOptions);
+const data = [
+  ["type", "montant"],
+  ["", 0]
+ 
 
-  ];
-
+];
+  const [dataExpenses, setDataExpenses] = useState(data);
     useEffect(()=> {
     console.log("PAGE LOAD - TO DO ONCE OR WHEN REFRESH");
-
+      //get all expenses
+      axios.get('http://localhost:3000/getAllExpenses')
+      .then((response) => {setAllExpenses(response.data)})  // Set data in state
+      .catch((error) => console.error('Error fetching data:', error)); // Handle errors
+      
+     // console.log("ALL EXPENSES :" +JSON.stringify(allExpenses, undefined, 4))
     },[])
   
 
- const [dataExpenses, setDataExpenses] = useState(data);
+    useEffect(()=> {
+      console.log("allExpenses USE EFFECT::" + JSON.stringify(allExpenses, undefined, 4));
+      //loop
+      if (Array.isArray(allExpenses)) {
+         allExpenses.map((expense) => (
+          dataExpenses.push([expense.expenseType,Number(expense.expenseAmount)]),
+         console.log("TYPE:" + expense.expenseType + "// Amnt:" + expense.expenseAmount)
+        ));
+      }
+      
+     
+      
+    },[allExpenses])
+
+
  
  useEffect(() => {
   // Listen for incoming messages from the server
@@ -96,6 +115,9 @@ const handleButton2Click = () => {
   // Add your custom logic for button 2 here
 };
 
+const handleButton3Click = ()=>{
+  console.log("allExpenses ::" + JSON.stringify(allExpenses, undefined, 4));
+}
 
       return (
         <div className="App">
@@ -121,6 +143,7 @@ const handleButton2Click = () => {
             <p>
             <button onClick={handleButton1Click}>Add</button>
             <button onClick={handleButton2Click}>Reset pie chart</button>
+            <button onClick={handleButton3Click}>TEST</button>
             </p>
         
 <p>
