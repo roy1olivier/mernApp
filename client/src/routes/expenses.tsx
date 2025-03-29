@@ -31,26 +31,33 @@ const data = [
       axios.get('http://localhost:3000/getAllExpenses')
       .then((response) => {setAllExpenses(response.data)})  // Set data in state
       .catch((error) => console.error('Error fetching data:', error)); // Handle errors
-      
-     // console.log("ALL EXPENSES :" +JSON.stringify(allExpenses, undefined, 4))
     },[])
   
 
     useEffect(()=> {
-      console.log("allExpenses USE EFFECT::" + JSON.stringify(allExpenses, undefined, 4));
       //loop
       if (Array.isArray(allExpenses)) {
          allExpenses.map((expense) => (
-          dataExpenses.push([expense.expenseType,Number(expense.expenseAmount)]),
-         console.log("TYPE:" + expense.expenseType + "// Amnt:" + expense.expenseAmount)
+          populateExpenses(expense)
         ));
       }
-      
-     
+      //console.log("DATA EXPENSE USE EFFECT::" + JSON.stringify(dataExpenses, undefined, 4));
       
     },[allExpenses])
 
+ function populateExpenses(expense : interfaceExpense){
 
+  const indexx = dataExpenses.findIndex(([key]) => key===expense.expenseType);
+  if(indexx == -1){
+    console.log("NOT FOUND, ADDING A NEW ONE");
+    dataExpenses.push([expense.expenseType,Number(expense.expenseAmount)]);
+  }
+  else{
+    console.log("FOUND, ADDING TO CURRENT");
+    let newValueForExpenseType = Number(dataExpenses[indexx][1])+Number(expense.expenseAmount);
+    dataExpenses[indexx][1] = newValueForExpenseType;
+  }
+}
  
  useEffect(() => {
   // Listen for incoming messages from the server
@@ -65,15 +72,6 @@ const data = [
 //BUTTONS LOGIC
 
 const handleButton1Click = () => {
-  const typeToFind = expenseType;
-  const indexx = dataExpenses.findIndex(([key]) => key===typeToFind);
-  if(indexx == -1){
-    console.log("NOT FOUND, ADDING A NEW ONE");
-    dataExpenses.push([expenseType,Number(expenseAmount)]);
-    setOptions({
-      ...options,
-      title: 'Mes Depenses',
-    });
     const expenseToSend : interfaceExpense = {
       expenseName:expenseName,
       expenseAmount:expenseAmount,
@@ -82,26 +80,6 @@ const handleButton1Click = () => {
     };
     console.log("Sending expense to backend server");
     sendItem(expenseToSend);
-  }
-  else{
-    let newValueForExpenseType = Number(dataExpenses[indexx][1])+Number(expenseAmount);
-    dataExpenses[indexx][1] = newValueForExpenseType;
-    setDataExpenses(dataExpenses);
-    //To force the pie chart to refresh itself
-    setOptions({
-      ...options,
-      title: 'Mes Depenses',
-    });
-    const expenseToSend : interfaceExpense = {
-      expenseName:expenseName,
-      expenseAmount:expenseAmount,
-      expenseDate:expenseDate,
-      expenseType:expenseType
-    };
-    console.log("Sending expense to backend server");
-    sendItem(expenseToSend);
-
-  }
   };
 
 // Logic for Button 2
