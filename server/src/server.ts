@@ -81,12 +81,12 @@ const io = new socketServer.Server(server, {
 });
 const connections = [];
 io.on('connection', function (socket) {
-	console.log("Connected to Socket!!"+ socket.id)	
+	//console.log("Connected to Socket!!"+ socket.id)	
 	connections.push(socket)
 
 
 	socket.on('disconnect', function(){
-		console.log('Disconnected - '+ socket.id);
+		//console.log('Disconnected - '+ socket.id);
 	});
 
   
@@ -96,7 +96,7 @@ io.on('connection', function (socket) {
   });
 
   // Send a welcome message to the client
-  console.log('Sending welcome message');
+  //console.log('Sending welcome message');
   socket.send('Welcome to the WebSocket server!');
 	
   

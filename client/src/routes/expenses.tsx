@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect , useRef } from 'react';
 import { Chart } from "react-google-charts";
-import { sendMessage, listenForMessages, sendItem, interfaceExpense } from '../utils/socket';
+import { sendMessage, listenForMessages, listenForNewExpenses, sendItem, interfaceExpense, socket } from '../utils/socket';
 import ModalComponent from "../components/Modal";
 
 
 import axios from 'axios';
+import exp from 'constants';
 
 
 function Expenses() {
@@ -14,17 +15,27 @@ function Expenses() {
  const [expenseType, setExpenseType] = useState('');
  const [isOpen, setIsOpen] = useState(true);
  const [allExpenses, setAllExpenses] = useState<interfaceExpense | interfaceExpense[] | null>(null);
+
+ const socketRef = useRef<any>(null);
+
  const initialOptions = {
   title: "Mes Depenses",
 };
 const [options, setOptions] = useState(initialOptions);
-const data = [
+const initialData = [
   ["type", "montant"],
   ["", 0]
  
 
 ];
-  const [dataExpenses, setDataExpenses] = useState(data);
+
+const [dataExpensesPieChart, setDataExpenses] = useState(initialData);
+
+
+useEffect(() => {
+  setDataExpenses(initialData);
+  }, [allExpenses]);
+
     useEffect(()=> {
     console.log("PAGE LOAD - TO DO ONCE OR WHEN REFRESH");
       //get all expenses
@@ -35,39 +46,74 @@ const data = [
   
 
     useEffect(()=> {
+      console.log("dataExpensesPieChart before populate::" + JSON.stringify(dataExpensesPieChart, undefined, 4) );
       //loop
       if (Array.isArray(allExpenses)) {
          allExpenses.map((expense) => (
           populateExpenses(expense)
         ));
       }
-      //console.log("DATA EXPENSE USE EFFECT::" + JSON.stringify(dataExpenses, undefined, 4));
+      console.log("dataExpensesPieChart after populate::" + JSON.stringify(dataExpensesPieChart, undefined, 4));
       
-    },[allExpenses])
+    },[dataExpensesPieChart])
 
  function populateExpenses(expense : interfaceExpense){
-
-  const indexx = dataExpenses.findIndex(([key]) => key===expense.expenseType);
+  const indexx = dataExpensesPieChart.findIndex(([key]) => key===expense.expenseType);
   if(indexx == -1){
-    console.log("NOT FOUND, ADDING A NEW ONE");
-    dataExpenses.push([expense.expenseType,Number(expense.expenseAmount)]);
+    dataExpensesPieChart.push([expense.expenseType,Number(expense.expenseAmount)]);
+    setDataExpenses(dataExpensesPieChart);
   }
   else{
-    console.log("FOUND, ADDING TO CURRENT");
-    let newValueForExpenseType = Number(dataExpenses[indexx][1])+Number(expense.expenseAmount);
-    dataExpenses[indexx][1] = newValueForExpenseType;
+    let newValueForExpenseType = Number(dataExpensesPieChart[indexx][1])+Number(expense.expenseAmount);
+    dataExpensesPieChart[indexx][1] = newValueForExpenseType;
+    setDataExpenses(dataExpensesPieChart);
   }
+  setOptions({
+    ...options,
+    title: 'Mes Depenses',
+ });
 }
+
+
  
- useEffect(() => {
-  // Listen for incoming messages from the server
-    listenForMessages();
+useEffect(() => {
+  socketRef.current = socket; 
+  const handleNewExpense = (newExpense: interfaceExpense) => {
+    console.log("NEW EXPENSE ADDED FROM SERVER: " + newExpense.expenseName);
+    //populateExpenses(expense);
+    setAllExpenses((previousExpensesState) => {
+      if (previousExpensesState === null) {
+        return [newExpense];
+      }
   
-  // Cleanup the socket connection when the component unmounts
+      // If prevState is an array, add the new expense
+      if (Array.isArray(previousExpensesState)) {
+        return [...previousExpensesState, newExpense];
+      }
+  
+      // If prevState is a single expense (not an array), convert it to an array
+      return [previousExpensesState, newExpense];
+    });
+
+    //console.log("DATA EXPENSES AFTER MESSAGE ::" + JSON.stringify(allExpenses, undefined, 4) )
+    //console.log("PIE CHART AFTER MESSAGE ::" + JSON.stringify(dataExpensesPieChart, undefined, 4) )
+  };
+
+  const handleMessage = (msg: string) => {
+    console.log("New Message: " + msg);
+  };
+
+  listenForNewExpenses(socketRef.current, handleNewExpense);
+  listenForMessages(socketRef.current, handleMessage);
+
+  // Cleanup listeners when the component unmounts
   return () => {
+    if (socketRef.current) {
+      socketRef.current.off('itemAdded', handleNewExpense);
+      socketRef.current.off('message', handleMessage);
+    }
   };
 }, []);
-
 
 //BUTTONS LOGIC
 
@@ -78,7 +124,6 @@ const handleButton1Click = () => {
       expenseDate:new Date().toDateString(),
       expenseType:expenseType
     };
-    console.log("Sending expense to backend server");
     sendItem(expenseToSend);
   };
 
@@ -130,7 +175,7 @@ const handleButton3Click = ()=>{
 
   <Chart
   chartType="PieChart"
-  data={dataExpenses}
+  data={dataExpensesPieChart}
   options={options}
   width={"100%"}
   height={"400px"}
