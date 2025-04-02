@@ -7,20 +7,22 @@ interface ModalProps {
   show: boolean;
   title: string;
   dialogDescription: string;
-  dialogAdditionalText: string;
+  cancelText:string;
+  confirmText:string;
   setShow:React.Dispatch<React.SetStateAction<boolean>>;
+  onPrimaryClick?: () => void;  
+  onSecondaryClick?: () => void; 
 }
 
-const ModalComponent: React.FC<ModalProps> = ({ title, dialogDescription, dialogAdditionalText,  show, setShow }) => {
+const ModalComponent: React.FC<ModalProps> = ({ title, dialogDescription, cancelText, confirmText,  show, setShow, onPrimaryClick, onSecondaryClick }) => {
   const handleClose = () => {setShow(false);}
 
   const buttonClickHandler = (buttonName: string) => {
 
-    if(buttonName=="Primary"){
-
-    }
-    else{
-     
+    if (buttonName === "Primary") {
+      if (onPrimaryClick) onPrimaryClick(); // Call the function from main page
+    } else {
+      if (onSecondaryClick) onSecondaryClick();
     }
     handleClose();
   }
@@ -36,10 +38,10 @@ const ModalComponent: React.FC<ModalProps> = ({ title, dialogDescription, dialog
         <Modal.Body>{dialogDescription}</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => buttonClickHandler('Secondary')}>
-            Close
+            {cancelText}
           </Button>
           <Button variant="primary" onClick={() => buttonClickHandler('Primary')}>
-            Save Changes
+           {confirmText}
           </Button>
         </Modal.Footer>
       </Modal>

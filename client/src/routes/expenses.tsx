@@ -5,18 +5,18 @@ import ModalComponent from "../components/Modal";
 
 
 import axios from 'axios';
-import exp from 'constants';
-
 
 function Expenses() {
  const [expenseName, setExpenseName] = useState('');
  const [expenseAmount, setExpenseAmount] = useState('');
  const [expenseDate, setExpenseDate] = useState('');
  const [expenseType, setExpenseType] = useState('');
- const [isOpen, setIsOpen] = useState(true);
  const [allExpenses, setAllExpenses] = useState<interfaceExpense | interfaceExpense[] | null>(null);
 
  const socketRef = useRef<any>(null);
+
+//Const for modal
+const [show, setShow] = useState(false);
 
  const initialOptions = {
   title: "Mes Depenses",
@@ -46,14 +46,14 @@ useEffect(() => {
   
 
     useEffect(()=> {
-      console.log("dataExpensesPieChart before populate::" + JSON.stringify(dataExpensesPieChart, undefined, 4) );
+      //console.log("dataExpensesPieChart before populate::" + JSON.stringify(dataExpensesPieChart, undefined, 4) );
       //loop
       if (Array.isArray(allExpenses)) {
          allExpenses.map((expense) => (
           populateExpenses(expense)
         ));
       }
-      console.log("dataExpensesPieChart after populate::" + JSON.stringify(dataExpensesPieChart, undefined, 4));
+      //console.log("dataExpensesPieChart after populate::" + JSON.stringify(dataExpensesPieChart, undefined, 4));
       
     },[dataExpensesPieChart])
 
@@ -130,13 +130,24 @@ const handleButton1Click = () => {
 // Logic for Button 2
 const handleButton2Click = () => {
   console.log("Button 2 clicked: Executing logic for Button 2");
+  setShow(true);
+
+};
+
+const handleReset = () => {
+  console.log("Reset button clicked");
   const emptydate=[["Empty", "Empty"]];
+  setAllExpenses(null);
   setDataExpenses(emptydate);
   console.log("SENDING MESSAGE");
   sendMessage("RESET");
-  setIsOpen(true);
-  // Add your custom logic for button 2 here
 };
+
+const handleSecondaryCancel = () => {
+  console.log("Cancel button clicked");
+  // Handle secondary button action
+};
+
 
 const handleButton3Click = ()=>{
   console.log("allExpenses ::" + JSON.stringify(allExpenses, undefined, 4));
@@ -169,19 +180,28 @@ const handleButton3Click = ()=>{
             <button onClick={handleButton3Click}>TEST</button>
             </p>
         
-<p>
-  VOICI LES DEPENSES:
+    <p>
+    VOICI LES DEPENSES:
 
 
-  <Chart
-  chartType="PieChart"
-  data={dataExpensesPieChart}
-  options={options}
-  width={"100%"}
-  height={"400px"}
+    <Chart
+    chartType="PieChart"
+    data={dataExpensesPieChart}
+    options={options}
+    width={"800px"}
+    height={"800px"}
+
+    />
+    </p>
+  <ModalComponent title="Reset warning!!" 
+  dialogDescription='This will reset all the expenses you have. Do you want to wipe everything?' 
+  cancelText='Cancel' 
+  confirmText='Reset everything' 
+  setShow={setShow} 
+  show={show}
+  onPrimaryClick={handleReset}
+  onSecondaryClick={handleSecondaryCancel}
   />
-  </p>
-  
           </header>
         </div>
       );
