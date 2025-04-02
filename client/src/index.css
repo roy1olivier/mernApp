@@ -12,11 +12,3 @@ code {
     monospace;
 }
 
-.modal-content {
-  max-width: 100%;  /* You can set a percentage or fixed width like 500px */
-}
-
-/* Customize backdrop (optional) */
-.modal-backdrop {
-  background-color: rgba(0, 0, 0, 0.7); /* Darker backdrop */
-}
