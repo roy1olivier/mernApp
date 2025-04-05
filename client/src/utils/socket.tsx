@@ -28,3 +28,16 @@ export const sendItem = (expense: interfaceExpense) => {
   console.log("Sending expense to server" )
   socket.emit("addExpense", expense);
 }
+
+export const sendServerExpenseReset = () => {
+  socket.emit("serverExpenseReset");
+}
+
+// Listen for incoming messages
+export const listenForServerExpenseReset = (socket: any, callback: (msg: string) => void) => {
+  socket.on('serverExpenseResetCompleted', callback);
+};
+
+export const listenForServerExpenseError = (socket: any, callback: (msg: string) => void) => {
+  socket.on('serverExpenseResetError', callback);
+};
