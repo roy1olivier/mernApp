@@ -1,6 +1,6 @@
 import React, { useState, useEffect , useRef } from 'react';
 import { Chart } from "react-google-charts";
-import { sendMessage, listenForMessages, listenForNewExpenses, sendItem, interfaceExpense, socket } from '../utils/socket';
+import { sendMessage, listenForMessages, listenForNewExpenses, sendItem, interfaceExpense, socket , listenForServerExpenseReset, listenForServerExpenseError, sendServerExpenseReset} from '../utils/socket';
 import ModalComponent from "../components/Modal";
 
 
@@ -95,16 +95,29 @@ useEffect(() => {
       return [previousExpensesState, newExpense];
     });
 
-    //console.log("DATA EXPENSES AFTER MESSAGE ::" + JSON.stringify(allExpenses, undefined, 4) )
-    //console.log("PIE CHART AFTER MESSAGE ::" + JSON.stringify(dataExpensesPieChart, undefined, 4) )
   };
 
   const handleMessage = (msg: string) => {
     console.log("New Message: " + msg);
   };
 
+
+  const handleServerExpenseReset = (msg: string) => {
+    const emptydate=[["Empty", "Empty"]];
+    setAllExpenses(null);
+    setDataExpenses(emptydate);
+  };
+
+  const handleServerExpenseError= (msg: string) => {
+    console.log("New Message: " + msg);
+  };
+
+
   listenForNewExpenses(socketRef.current, handleNewExpense);
   listenForMessages(socketRef.current, handleMessage);
+  listenForServerExpenseReset(socketRef.current, handleServerExpenseReset);
+  listenForServerExpenseError(socketRef.current, handleServerExpenseError);
+
 
   // Cleanup listeners when the component unmounts
   return () => {
@@ -136,11 +149,9 @@ const handleButton2Click = () => {
 
 const handleReset = () => {
   console.log("Reset button clicked");
-  const emptydate=[["Empty", "Empty"]];
-  setAllExpenses(null);
-  setDataExpenses(emptydate);
   console.log("SENDING MESSAGE");
-  sendMessage("RESET");
+  //sendMessage("RESET");
+  sendServerExpenseReset();
 };
 
 const handleSecondaryCancel = () => {

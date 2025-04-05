@@ -35,7 +35,6 @@ app.get('/health', (_req: Request, res: Response) => {
 
 
 // POST endpoint to insert data into the database
-app.use(express.json());
 app.post('/addExpense', async (req, res) => {
     try {
         const { name, amount, date, typeD } = req.body;
@@ -48,7 +47,6 @@ app.post('/addExpense', async (req, res) => {
   });
   
   // GET endpoint to retrieve all people from the database
-  app.use(express.json());
   app.get('/getAllExpenses', async (req, res) => {
     try {
       const depense = await expenseModel.find({}, { _id: 0, __v:0 });
@@ -114,6 +112,22 @@ io.on('connection', function (socket) {
         .catch(err => console.log(err));
 	})
 
+  socket.on('serverExpenseReset', async function() {
+    console.log("RESET ALL EXPENSES");
+
+    try {
+        // Wait for the delete operation to finish
+        const dd = await expenseModel.deleteMany({});
+        
+        console.log("after reset::", dd);
+        io.emit('serverExpenseResetCompleted', "Data Reset Completed");
+        console.log("RESET Done");
+    } catch (error) {
+        io.emit('serverExpenseResetError', error);
+        console.log("RESET failed", error);
+    }
+});
+
   socket.on('chat message', (msg) => {
     console.log('Message received:', msg);
     // Emit an event back to the client
@@ -121,6 +135,7 @@ io.on('connection', function (socket) {
   });
 
 });
+
 io.listen(4000);
 app.listen(PORT, () => {
   console.log(`Server is running on PORT: ${PORT}`);
