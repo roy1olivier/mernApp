@@ -21,9 +21,6 @@ function App() {
         <nav>
             <ul>
               <li>
-                <a href={`/welcome`}>Welcome Bro</a>
-              </li>
-              <li>
                 <a href={`/expenses`}>Expenses</a>
               </li>
               <li>

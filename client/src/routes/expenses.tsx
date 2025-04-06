@@ -2,6 +2,7 @@ import React, { useState, useEffect , useRef } from 'react';
 import { Chart } from "react-google-charts";
 import { sendMessage, listenForMessages, listenForNewExpenses, sendItem, interfaceExpense, socket , listenForServerExpenseReset, listenForServerExpenseError, sendServerExpenseReset} from '../utils/socket';
 import ModalComponent from "../components/Modal";
+import NotificationModal from "../components/NotificationModal";
 
 
 import axios from 'axios';
@@ -12,11 +13,12 @@ function Expenses() {
  const [expenseDate, setExpenseDate] = useState('');
  const [expenseType, setExpenseType] = useState('');
  const [allExpenses, setAllExpenses] = useState<interfaceExpense | interfaceExpense[] | null>(null);
-
+ const [notificationMessage, setNotificationMessage]= useState('');
  const socketRef = useRef<any>(null);
 
 //Const for modal
 const [show, setShow] = useState(false);
+const [showNotificationModal, setShowNotificationModal] = useState(false);
 
  const initialOptions = {
   title: "Mes Depenses",
@@ -94,10 +96,14 @@ useEffect(() => {
       // If prevState is a single expense (not an array), convert it to an array
       return [previousExpensesState, newExpense];
     });
+    setNotificationMessage("NEW ITEM ADDED");
+    setShowNotificationModal(true);
 
   };
 
   const handleMessage = (msg: string) => {
+    setNotificationMessage(msg);
+    setShowNotificationModal(true);
     console.log("New Message: " + msg);
   };
 
@@ -159,6 +165,9 @@ const handleSecondaryCancel = () => {
   // Handle secondary button action
 };
 
+const handleNotificationMessage= () => {
+
+}
 
 const handleButton3Click = ()=>{
   console.log("allExpenses ::" + JSON.stringify(allExpenses, undefined, 4));
@@ -195,24 +204,32 @@ const handleButton3Click = ()=>{
     VOICI LES DEPENSES:
 
 
-    <Chart
-    chartType="PieChart"
-    data={dataExpensesPieChart}
-    options={options}
-    width={"800px"}
-    height={"800px"}
+        <Chart
+        chartType="PieChart"
+        data={dataExpensesPieChart}
+        options={options}
+        width={"800px"}
+        height={"800px"}
 
-    />
-    </p>
-  <ModalComponent title="Reset warning!!" 
-  dialogDescription='This will reset all the expenses you have. Do you want to wipe everything?' 
-  cancelText='Cancel' 
-  confirmText='Reset everything' 
-  setShow={setShow} 
-  show={show}
-  onPrimaryClick={handleReset}
-  onSecondaryClick={handleSecondaryCancel}
-  />
+        />
+        </p>
+      <ModalComponent title="Reset warning!!" 
+      dialogDescription='This will reset all the expenses you have. Do you want to wipe everything?' 
+      cancelText='Cancel' 
+      confirmText='Reset everything' 
+      setShow={setShow} 
+      show={show}
+      onPrimaryClick={handleReset}
+      onSecondaryClick={handleSecondaryCancel}
+      />
+
+      <NotificationModal title="New Notification!!" 
+      dialogDescription={notificationMessage}  
+      confirmText='Ok' 
+      setShow={setShowNotificationModal} 
+      show={showNotificationModal}
+      />
+
           </header>
         </div>
       );

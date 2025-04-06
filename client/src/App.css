@@ -14,7 +14,7 @@
 }
 
 .App-header {
-  background-color: #1d335f;
+  background-color: #254c9b;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -43,4 +43,15 @@
 /* Customize backdrop (optional) */
 .modal-backdrop {
   background-color: rgba(0, 0, 0, 0.7); /* Darker backdrop */
+}
+
+
+.custom-notification-modal-content .modal-content {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  margin: 0; /* Remove default margin */
+  color: black;
+  width: auto;
+  max-width: 300px; /* Adjust to fit your needs */
 }
