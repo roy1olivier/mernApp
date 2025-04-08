@@ -4,7 +4,8 @@ export interface interfaceExpense {
   expenseName:string,
   expenseAmount:string,
   expenseDate:string,
-  expenseType:string
+  expenseType:string,
+  __id?:string
 }
 
 // Create a Socket.io client instance
@@ -27,11 +28,11 @@ export const listenForMessages = (socket: any, callback: (msg: string) => void) 
 export const sendItem = (expense: interfaceExpense) => {
   console.log("Sending expense to server" )
   socket.emit("addExpense", expense);
-}
+};
 
 export const sendServerExpenseReset = () => {
   socket.emit("serverExpenseReset");
-}
+};
 
 // Listen for incoming messages
 export const listenForServerExpenseReset = (socket: any, callback: (msg: string) => void) => {
