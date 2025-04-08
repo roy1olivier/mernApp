@@ -49,7 +49,7 @@ app.post('/addExpense', async (req, res) => {
   // GET endpoint to retrieve all people from the database
   app.get('/getAllExpenses', async (req, res) => {
     try {
-      const depense = await expenseModel.find({}, { _id: 0, __v:0 });
+      const depense = await expenseModel.find({}, { __v:0 });
       res.status(200).json(depense);
     } catch (error : any) {
       res.status(400).json({ error: 'Failed to retrieve people', details: error.message });
@@ -95,7 +95,7 @@ io.on('connection', function (socket) {
 
   // Send a welcome message to the client
   //console.log('Sending welcome message');
-  socket.send('Welcome to the WebSocket server!');
+  //socket.send('Welcome to the WebSocket server!');
 	
   
   socket.on('addExpense',(addData:interfaceExpense)=>{
@@ -108,7 +108,7 @@ io.on('connection', function (socket) {
 		});
    
 		expenseItem.save()
-        .then(result => {io.emit('itemAdded',addData); console.log("expense saved"+result)})
+        .then(result => {io.emit('itemAdded',result); console.log("expense saved"+result)})
         .catch(err => console.log(err));
 	})
 
