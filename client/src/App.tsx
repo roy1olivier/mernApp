@@ -26,6 +26,9 @@ function App() {
               <li>
                 <a href={`/test`}>TEst</a>
               </li>
+              <li>
+                <a href={`/consultData`}>Consult Data</a>
+              </li>
             </ul>
           </nav>
       </header>
