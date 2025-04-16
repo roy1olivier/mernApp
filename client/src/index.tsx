@@ -7,6 +7,8 @@ import reportWebVitals from './reportWebVitals';
 import Root from "./routes/root";
 import Expenses from './routes/expenses'
 import Test from './routes/test'
+import ConsultData from './routes/ConsultData';
+
 import {
   createBrowserRouter,
   RouterProvider,
@@ -18,16 +20,16 @@ const router = createBrowserRouter([
     element: <App/>,
   },
   {
-    path: "/welcome",
-    element: <Welcome />,
-  },
-  {
     path: "/expenses",
     element: <Expenses />,
   },
   {
     path: "/test",
     element: <Test />,
+  },
+  {
+    path: "/consultData",
+    element: <ConsultData />,
   },
 ]);
 const root = ReactDOM.createRoot(

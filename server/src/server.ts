@@ -66,6 +66,19 @@ app.post('/addExpense', async (req, res) => {
     }
   });
 
+  // GET endpoint for testing purpose...
+  app.get('/getExpense', async (req, res) => {
+  
+    //console.log(await expenseModel.find().lean());
+    console.log(expenseModel.schema.paths);
+    try {
+      const ObjectId = mongoose.Types.ObjectId;
+      const expense = await expenseModel.findById(new ObjectId(""));
+      res.status(200).json(expense);
+    } catch (error : any) {
+      res.status(400).json({ error: 'Failed to retrieve people', details: error.message });
+    }
+  });
 
 const PORT: string | number = process.env.PORT || 3000;
 
@@ -97,6 +110,23 @@ io.on('connection', function (socket) {
   //console.log('Sending welcome message');
   //socket.send('Welcome to the WebSocket server!');
 	
+  socket.on('updateExpense',async (updatedExpense:interfaceExpense)=>{
+      const existingExpense = await expenseModel.findById(updatedExpense._id);//updatedExpense.__id);
+      if(existingExpense){
+        existingExpense.expenseAmount = updatedExpense.expenseAmount;
+        existingExpense.expenseDate = updatedExpense.expenseDate;
+        existingExpense.expenseName = updatedExpense.expenseName;
+        existingExpense.expenseType = updatedExpense.expenseType;
+  
+         await existingExpense.save()
+        .then(result => {io.emit('expenseUpdated',result); console.log("expense updated"+result)})
+        .catch(err => console.log(err));
+      }
+      else{
+        console.log("Expense not found");
+      }
+	})
+
   
   socket.on('addExpense',(addData:interfaceExpense)=>{
     console.log("new expense received:: " +  addData);

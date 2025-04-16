@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Chart } from "react-google-charts";
-import { sendMessage, listenForMessages, listenForNewExpenses, sendItem, interfaceExpense, socket, listenForServerExpenseReset, listenForServerExpenseError, sendServerExpenseReset } from '../utils/socket';
+import { sendMessage, listenForMessages, listenForNewExpenses, sendItem, interfaceExpense, socket, listenForServerExpenseReset, listenForServerExpenseError, sendServerExpenseReset, listenForUpdateExpense } from '../utils/socket';
 import ModalComponent from "../components/Modal";
 import NotificationModal from "../components/NotificationModal";
 
@@ -15,6 +15,7 @@ function Expenses() {
   const [allExpenses, setAllExpenses] = useState<interfaceExpense | interfaceExpense[] | null>(null);
   const [notificationMessage, setNotificationMessage] = useState('');
   const socketRef = useRef<any>(null);
+  const allExpensesRef = useRef(allExpenses);
 
   //Const for modal
   const [show, setShow] = useState(false);
@@ -35,6 +36,7 @@ function Expenses() {
 
 
   useEffect(() => {
+    allExpensesRef.current = allExpenses;
     setDataExpenses(initialData);
   }, [allExpenses]);
 
@@ -42,21 +44,17 @@ function Expenses() {
     console.log("PAGE LOAD - TO DO ONCE OR WHEN REFRESH");
     //get all expenses
     axios.get('http://localhost:3000/getAllExpenses')
-      .then((response) => { setAllExpenses(response.data) })  
+      .then((response) => { setAllExpenses(response.data) ; console.log("SET ALL EXPENSES :" + JSON.stringify(allExpenses, undefined, 4))})  
       .catch((error) => console.error('Error fetching data:', error)); 
   }, [])
 
 
   useEffect(() => {
-    //console.log("dataExpensesPieChart before populate::" + JSON.stringify(dataExpensesPieChart, undefined, 4) );
-    //loop
     if (Array.isArray(allExpenses)) {
       allExpenses.map((expense) => (
         populateExpenses(expense)
       ));
     }
-    //console.log("dataExpensesPieChart after populate::" + JSON.stringify(dataExpensesPieChart, undefined, 4));
-
   }, [dataExpensesPieChart])
 
   function populateExpenses(expense: interfaceExpense) {
@@ -100,6 +98,18 @@ function Expenses() {
 
     };
 
+    const handleUpdatedExpense = (updatedExpense: interfaceExpense) => {
+      if (Array.isArray(allExpensesRef.current)) {
+        const updatedExpenses = allExpensesRef.current.map(expense =>
+          expense._id === updatedExpense._id
+            ? { ...expense, expenseAmount: updatedExpense.expenseAmount, expenseType: updatedExpense.expenseType, expenseDate : updatedExpense.expenseDate, expenseName: updatedExpense.expenseName } // <-- update this one
+            : expense
+        );
+        setAllExpenses(updatedExpenses);
+      }
+    }
+
+
     const handleMessage = (msg: string) => {
       setNotificationMessage(msg);
       setShowNotificationModal(true);
@@ -125,7 +135,7 @@ function Expenses() {
     listenForMessages(socketRef.current, handleMessage);
     listenForServerExpenseReset(socketRef.current, handleServerExpenseReset);
     listenForServerExpenseError(socketRef.current, handleServerExpenseError);
-
+    listenForUpdateExpense(socketRef.current, handleUpdatedExpense)
 
     // Cleanup listeners when the component unmounts
     return () => {
