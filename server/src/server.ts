@@ -6,7 +6,7 @@ import expenseModel from './models/depenses'
 import http from 'http';
 import socketServer   from 'socket.io';
 import {interfaceExpense} from './interfaces/depensesInterface'
-
+import authRoutes from './routes/auth';
 dotenv.config();
 
 const app: Express = express();
@@ -79,6 +79,14 @@ app.post('/addExpense', async (req, res) => {
       res.status(400).json({ error: 'Failed to retrieve people', details: error.message });
     }
   });
+
+  
+
+
+
+
+
+
 
 const PORT: string | number = process.env.PORT || 3000;
 
@@ -165,7 +173,7 @@ io.on('connection', function (socket) {
   });
 
 });
-
+app.use('/api/auth', authRoutes);
 io.listen(4000);
 app.listen(PORT, () => {
   console.log(`Server is running on PORT: ${PORT}`);

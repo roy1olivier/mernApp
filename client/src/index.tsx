@@ -8,6 +8,10 @@ import Root from "./routes/root";
 import Expenses from './routes/expenses'
 import Test from './routes/test'
 import ConsultData from './routes/ConsultData';
+import Login from './routes/Login';
+
+import PrivateRoute from './components/PrivateRoutes';
+import { AuthProvider } from './context/AuthContext';
 
 import {
   createBrowserRouter,
@@ -21,7 +25,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/expenses",
-    element: <Expenses />,
+    element: <PrivateRoute><Expenses /></PrivateRoute>,
   },
   {
     path: "/test",
@@ -29,14 +33,20 @@ const router = createBrowserRouter([
   },
   {
     path: "/consultData",
-    element: <ConsultData />,
+    element: <PrivateRoute><ConsultData /></PrivateRoute>,
+  },
+  {
+    path: "/Login",
+    element: <Login />,
   },
 ]);
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
+  <AuthProvider>
     <RouterProvider router={router} />
+    </AuthProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function
