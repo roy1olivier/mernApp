@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Chart } from "react-google-charts";
-import { sendMessage, listenForMessages, listenForNewExpenses, sendItem, interfaceExpense, socket, listenForServerExpenseReset, listenForServerExpenseError, sendServerExpenseReset, listenForUpdateExpense } from '../utils/socket';
+import { listenForMessages, listenForNewExpenses, sendItem, interfaceExpense, socket, listenForServerExpenseReset, listenForServerExpenseError, sendServerExpenseReset, listenForUpdateExpense } from '../utils/socket';
 import ModalComponent from "../components/Modal";
 import NotificationModal from "../components/NotificationModal";
 
@@ -59,7 +59,7 @@ function Expenses() {
 
   function populateExpenses(expense: interfaceExpense) {
     const indexx = dataExpensesPieChart.findIndex(([key]) => key === expense.expenseType);
-    if (indexx == -1) {
+    if (indexx === -1) {
       dataExpensesPieChart.push([expense.expenseType, Number(expense.expenseAmount)]);
       setDataExpenses(dataExpensesPieChart);
     }
@@ -168,7 +168,6 @@ function Expenses() {
   const handleReset = () => {
     console.log("Reset button clicked");
     console.log("SENDING MESSAGE");
-    //sendMessage("RESET");
     sendServerExpenseReset();
   };
 
