@@ -3,8 +3,10 @@ import axios from 'axios';
 import {jwtDecode } from 'jwt-decode';
 import { AuthContext } from '../context/AuthContext';
 
-interface TokenPayload {
+export interface TokenPayload {
   userId: string;
+  userName: string;
+  userGroup: string;
   exp: number;
   iat: number;
 }

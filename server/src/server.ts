@@ -7,6 +7,7 @@ import http from 'http';
 import socketServer   from 'socket.io';
 import {interfaceExpense} from './interfaces/depensesInterface'
 import authRoutes from './routes/auth';
+import dataRoutes from './routes/data'
 dotenv.config();
 
 const app: Express = express();
@@ -28,65 +29,6 @@ const uri: string =
         console.error(error);
     }
 })();
-
-app.get('/health', (_req: Request, res: Response) => {
-    res.status(200).send('Server is running');
-});
-
-
-// POST endpoint to insert data into the database
-app.post('/addExpense', async (req, res) => {
-    try {
-        const { name, amount, date, typeD } = req.body;
-        const depense = new expenseModel({ name, amount, date, typeD});
-        await depense.save();
-        res.status(201).json({ message: 'Person added successfully', depense });
-      } catch (error : any) {
-        res.status(400).json({ error: 'Failed to add person', details: error.message });
-      }
-  });
-  
-  // GET endpoint to retrieve all people from the database
-  app.get('/getAllExpenses', async (req, res) => {
-    try {
-      const depense = await expenseModel.find({}, { __v:0 });
-      res.status(200).json(depense);
-    } catch (error : any) {
-      res.status(400).json({ error: 'Failed to retrieve people', details: error.message });
-    }
-  });
-
-
-  app.get('/wipe-everything', async (req, res) => {
-    try {
-      const depensess = await expenseModel.deleteMany({})
-      res.status(200).json(depensess);
-    } catch (error : any) {
-      res.status(400).json({ error: 'Failed to delete people', details: error.message });
-    }
-  });
-
-  // GET endpoint for testing purpose...
-  app.get('/getExpense', async (req, res) => {
-  
-    //console.log(await expenseModel.find().lean());
-    console.log(expenseModel.schema.paths);
-    try {
-      const ObjectId = mongoose.Types.ObjectId;
-      const expense = await expenseModel.findById(new ObjectId(""));
-      res.status(200).json(expense);
-    } catch (error : any) {
-      res.status(400).json({ error: 'Failed to retrieve people', details: error.message });
-    }
-  });
-
-  
-
-
-
-
-
-
 
 const PORT: string | number = process.env.PORT || 3000;
 
@@ -142,7 +84,9 @@ io.on('connection', function (socket) {
 			expenseName:addData.expenseName,
 			expenseAmount:addData.expenseAmount,
 			expenseDate: addData.expenseDate,
-      expenseType:addData.expenseType
+      expenseType:addData.expenseType,
+      userId:addData.userId,
+      groupsId:addData.groupsId,
 		});
    
 		expenseItem.save()
@@ -174,6 +118,7 @@ io.on('connection', function (socket) {
 
 });
 app.use('/api/auth', authRoutes);
+app.use('/api/data',dataRoutes);
 io.listen(4000);
 app.listen(PORT, () => {
   console.log(`Server is running on PORT: ${PORT}`);

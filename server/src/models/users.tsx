@@ -5,7 +5,7 @@ const userSchema =  new Schema<userInterface>({
       
        userName:{type: String, required: true},
        password: { type: String, required: true },
-       userGroups:{type: String, required: true},
+       userGroups:[{type: String, required: true}],
        
        userExpenses: [
         {

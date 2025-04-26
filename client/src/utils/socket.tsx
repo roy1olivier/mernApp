@@ -5,7 +5,9 @@ export interface interfaceExpense {
   expenseAmount:string,
   expenseDate:string,
   expenseType:string,
-  _id?:string
+  _id?:string,
+  userId?:string,
+  groupsId?:string[]
 }
 
 // Create a Socket.io client instance
