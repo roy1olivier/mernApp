@@ -4,6 +4,6 @@ export interface userInterface {
     _id:string,
     password: string;
     userName:string,
-    userGroups:string,
+    userGroups:string[],
     userExpenses:interfaceExpense[],
   }

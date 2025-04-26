@@ -3,11 +3,18 @@ import { Chart } from "react-google-charts";
 import { listenForMessages, listenForNewExpenses, sendItem, interfaceExpense, socket, listenForServerExpenseReset, listenForServerExpenseError, sendServerExpenseReset, listenForUpdateExpense } from '../utils/socket';
 import ModalComponent from "../components/Modal";
 import NotificationModal from "../components/NotificationModal";
-
+import {jwtDecode } from 'jwt-decode';
+import { useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
+import {TokenPayload} from'./Login';
 
 import axios from 'axios';
 
 function Expenses() {
+
+  const { token } = useContext(AuthContext);
+  const decoded: TokenPayload = jwtDecode(token);
+
   const [expenseName, setExpenseName] = useState('');
   const [expenseAmount, setExpenseAmount] = useState('');
   const [expenseDate, setExpenseDate] = useState('');
@@ -16,7 +23,7 @@ function Expenses() {
   const [notificationMessage, setNotificationMessage] = useState('');
   const socketRef = useRef<any>(null);
   const allExpensesRef = useRef(allExpenses);
-
+ 
   //Const for modal
   const [show, setShow] = useState(false);
   const [showNotificationModal, setShowNotificationModal] = useState(false);
@@ -43,7 +50,7 @@ function Expenses() {
   useEffect(() => {
     console.log("PAGE LOAD - TO DO ONCE OR WHEN REFRESH");
     //get all expenses
-    axios.get('http://localhost:3000/getAllExpenses')
+    axios.get('http://localhost:3000/api/data/getAllExpenses')
       .then((response) => { setAllExpenses(response.data) ; console.log("SET ALL EXPENSES :" + JSON.stringify(allExpenses, undefined, 4))})  
       .catch((error) => console.error('Error fetching data:', error)); 
   }, [])
@@ -153,8 +160,11 @@ function Expenses() {
       expenseName: expenseName,
       expenseAmount: expenseAmount,
       expenseDate: new Date().toDateString(),
-      expenseType: expenseType
+      expenseType: expenseType,
+      userId: decoded.userId,
+      groupsId:[],
     };
+    expenseToSend.groupsId.push(decoded.userGroup);
     sendItem(expenseToSend);
   };
 

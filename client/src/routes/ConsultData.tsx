@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { updateExpense, listenForMessages, listenForNewExpenses, interfaceExpense, socket, listenForServerExpenseReset, listenForServerExpenseError } from '../utils/socket';
+import { useState, useEffect } from 'react';
+import { updateExpense, interfaceExpense } from '../utils/socket';
 import axios from 'axios';
 import ConsultEditDateComponent from "../components/ConsultEditDateComponent";
 
@@ -12,7 +12,6 @@ function ConsultData () {
   const [expenseAmount, setAmount] = useState(expense?.expenseAmount || "");
   const [expenseDate, setDate] = useState(expense?.expenseDate || "");
   const [expenseType, setType] = useState(expense?.expenseType || "");
- const socketRef = useRef<any>(null);
 
  useEffect(() => {
   //get all expenses
@@ -21,15 +20,10 @@ function ConsultData () {
 
   useEffect(() => {
     //get all expenses
-    axios.get('http://localhost:3000/getAllExpenses')
+    axios.get('http://localhost:3000/api/data/getAllExpenses')
       .then((response) => { setAllExpenses(response.data) })  
       .catch((error) => console.error('Error fetching data:', error)); 
   }, [])
-
-
-  const handleButton3Click = () => {
-    console.log("allExpenses ::" + JSON.stringify(allExpenses, undefined, 4));
-  }
 
   const handleButtonClick = (expense: interfaceExpense) => {
     console.log(`Button clicked for ${expense.expenseName}`);
@@ -75,7 +69,7 @@ function ConsultData () {
             <ul>
             {listExpenses}
             </ul>
-            <button onClick={handleButton3Click}>TEST</button>
+           
             <ConsultEditDateComponent title="Edit Expense"
               dialogDescription='Information about this expense, do you wish to edit it?'
               cancelText='Cancel'
