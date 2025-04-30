@@ -8,6 +8,7 @@ import socketServer   from 'socket.io';
 import {interfaceExpense} from './interfaces/depensesInterface'
 import authRoutes from './routes/auth';
 import dataRoutes from './routes/data'
+import userModel from './models/users';
 dotenv.config();
 
 const app: Express = express();
@@ -69,7 +70,7 @@ io.on('connection', function (socket) {
         existingExpense.expenseType = updatedExpense.expenseType;
   
          await existingExpense.save()
-        .then(result => {io.emit('expenseUpdated',result); console.log("expense updated"+result)})
+        .then(result => {io.emit('expenseUpdated:' + existingExpense.groupsId,result); console.log("expense updated"+result)})
         .catch(err => console.log(err));
       }
       else{
@@ -78,7 +79,8 @@ io.on('connection', function (socket) {
 	})
 
   
-  socket.on('addExpense',(addData:interfaceExpense)=>{
+ /* socket.on('addExpense',(addData:interfaceExpense)=>{
+    
     console.log("new expense received:: " +  addData);
 		var expenseItem = new expenseModel({
 			expenseName:addData.expenseName,
@@ -92,7 +94,48 @@ io.on('connection', function (socket) {
 		expenseItem.save()
         .then(result => {io.emit('itemAdded',result); console.log("expense saved"+result)})
         .catch(err => console.log(err));
+	})*/
+
+  socket.on('addExpense', async(addData:interfaceExpense)=>{
+    
+    console.log("new expense received:: " +  addData);
+		const session = await mongoose.startSession();
+
+try {
+  session.startTransaction();
+
+  // 1. Save the expense
+  const expenseItem = await expenseModel.create([{
+    expenseName: addData.expenseName,
+    expenseAmount: addData.expenseAmount,
+    expenseDate: addData.expenseDate,
+    expenseType: addData.expenseType,
+    userId: addData.userId,
+    groupsId: addData.groupsId,
+  }], { session });
+
+  // 2. Update the user
+  await userModel.findByIdAndUpdate(
+    addData.userId,
+    { $push: { userExpenses: expenseItem[0]._id } },
+    { session }
+  );
+
+  // 3. Commit the transaction
+  await session.commitTransaction();
+  session.endSession();
+
+  // 4. Notify clients
+  io.emit('itemAdded', expenseItem[0]);
+  console.log("Expense and user updated:", expenseItem[0]);
+
+} catch (error) {
+  await session.abortTransaction();
+  session.endSession();
+  console.error("Transaction failed:", error);
+}
 	})
+
 
   socket.on('serverExpenseReset', async function() {
     console.log("RESET ALL EXPENSES");

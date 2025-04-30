@@ -9,6 +9,7 @@ import Expenses from './routes/expenses'
 import Test from './routes/test'
 import ConsultData from './routes/ConsultData';
 import Login from './routes/Login';
+import UserInfoPage from './routes/UserInfo';
 
 import PrivateRoute from './components/PrivateRoutes';
 import { AuthProvider } from './context/AuthContext';
@@ -39,6 +40,11 @@ const router = createBrowserRouter([
     path: "/Login",
     element: <Login />,
   },
+  {
+    path: "/UserInfo",
+    element: <PrivateRoute><UserInfoPage /></PrivateRoute>,
+  },
+
 ]);
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

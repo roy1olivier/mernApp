@@ -6,5 +6,5 @@ export interface interfaceExpense {
     expenseDate:string,
     expenseType:string,
     userId: Types.ObjectId; // References a User
-    groupsId: string[];
+    groupsId: string;
   }

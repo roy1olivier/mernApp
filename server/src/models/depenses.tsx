@@ -11,7 +11,7 @@ const expenseSchema =  new Schema<interfaceExpense>({
         ref: 'User', // This matches the user model name
         required: true
       },
-    groupsId: [{type: String, required: true}],
+    groupsId: {type: String, required: true},
 })
 
 const expenseModel = mongoose.model('Depense', expenseSchema);
