@@ -23,6 +23,9 @@ function App() {
               <li>
                 <a href={`/Login`}>Login Dude</a>
               </li>
+              <li>
+                <a href={`/UserInfo`}>User info page</a>
+              </li>
               
             </ul>
           </nav>

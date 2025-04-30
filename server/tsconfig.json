@@ -11,5 +11,6 @@
         "skipLibCheck": true,
         "typeRoots": ["./src/types", "./node_modules/@types"]
     },
-    "exclude": ["node_modules", "dist", "client"]
+    "exclude": ["node_modules", "dist", "client"],
+    "include": ["server/**/*.ts", "tests/**/*.ts"]
 }

@@ -7,7 +7,7 @@ export interface interfaceExpense {
   expenseType:string,
   _id?:string,
   userId?:string,
-  groupsId?:string[]
+  groupsId?:string,
 }
 
 // Create a Socket.io client instance
@@ -22,8 +22,8 @@ export const listenForNewExpenses = (socket: any, callback: (msg: interfaceExpen
   socket.on('itemAdded', callback);
 };
 
-export const listenForUpdateExpense = (socket: any, callback: (msg: interfaceExpense) => void) => {
-  socket.on('expenseUpdated', callback);
+export const listenForUpdateExpense = (socket: any, callback: (msg: interfaceExpense) => void, groupId : string) => {
+  socket.on('expenseUpdated:' + groupId, callback);
 };
 
 // Listen for incoming messages

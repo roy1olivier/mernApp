@@ -6,7 +6,7 @@ import { AuthContext } from '../context/AuthContext';
 export interface TokenPayload {
   userId: string;
   userName: string;
-  userGroup: string;
+  userGroup: string[];
   exp: number;
   iat: number;
 }

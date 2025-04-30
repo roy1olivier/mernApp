@@ -142,7 +142,16 @@ function Expenses() {
     listenForMessages(socketRef.current, handleMessage);
     listenForServerExpenseReset(socketRef.current, handleServerExpenseReset);
     listenForServerExpenseError(socketRef.current, handleServerExpenseError);
-    listenForUpdateExpense(socketRef.current, handleUpdatedExpense)
+    console.log("adding userGroup:");
+    const userGroups = Array.isArray(decoded.userGroup)
+    ? decoded.userGroup
+    : [decoded.userGroup]; // wrap string in array
+  
+  userGroups.forEach((groupId) => {
+    console.log("adding userGroup:", groupId);
+    listenForUpdateExpense(socketRef.current, handleUpdatedExpense, groupId);
+  });
+    
 
     // Cleanup listeners when the component unmounts
     return () => {
@@ -162,9 +171,8 @@ function Expenses() {
       expenseDate: new Date().toDateString(),
       expenseType: expenseType,
       userId: decoded.userId,
-      groupsId:[],
+      groupsId:decoded.userGroup[0],
     };
-    expenseToSend.groupsId.push(decoded.userGroup);
     sendItem(expenseToSend);
   };
 
@@ -187,7 +195,7 @@ function Expenses() {
   };
 
   const handleButton3Click = () => {
-    console.log("allExpenses ::" + JSON.stringify(allExpenses, undefined, 4));
+    console.log("decoded ::" + JSON.stringify(decoded, undefined, 4));
   }
 
   return (
