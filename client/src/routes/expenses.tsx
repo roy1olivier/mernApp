@@ -45,7 +45,7 @@ function Expenses() {
   useEffect(() => {
     allExpensesRef.current = allExpenses;
     setDataExpenses(initialData);
-  }, [allExpenses]);
+  }, [allExpenses]);// eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     console.log("PAGE LOAD - TO DO ONCE OR WHEN REFRESH");
@@ -53,7 +53,7 @@ function Expenses() {
     axios.get('http://localhost:3000/api/data/getAllExpenses')
       .then((response) => { setAllExpenses(response.data) ; console.log("SET ALL EXPENSES :" + JSON.stringify(allExpenses, undefined, 4))})  
       .catch((error) => console.error('Error fetching data:', error)); 
-  }, [])
+  }, []);// eslint-disable-line react-hooks/exhaustive-deps
 
 
   useEffect(() => {
@@ -62,7 +62,7 @@ function Expenses() {
         populateExpenses(expense)
       ));
     }
-  }, [dataExpensesPieChart])
+  }, [dataExpensesPieChart]);// eslint-disable-line react-hooks/exhaustive-deps
 
   function populateExpenses(expense: interfaceExpense) {
     const indexx = dataExpensesPieChart.findIndex(([key]) => key === expense.expenseType);
@@ -160,7 +160,7 @@ function Expenses() {
         socketRef.current.off('message', handleMessage);
       }
     };
-  }, []);
+  }, []);// eslint-disable-line react-hooks/exhaustive-deps
 
   //BUTTONS LOGIC
 

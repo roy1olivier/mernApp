@@ -2,9 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-import Welcome from './welcome';
 import reportWebVitals from './reportWebVitals';
-import Root from "./routes/root";
 import Expenses from './routes/expenses'
 import Test from './routes/test'
 import ConsultData from './routes/ConsultData';
